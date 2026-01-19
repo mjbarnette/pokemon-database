@@ -81,18 +81,18 @@ Run tests
  mvn test
 
 
-🧪 Testing
+### Testing
 The project uses JUnit 5 with H2 in-memory database for isolated, repeatable tests.
 Run tests:
 mvn test
 
-Test coverage includes:
+### Test coverage includes:
 CRUD operations
 Transaction rollback scenarios
 Evolution chain retrieval
 Type-based filtering
 Sorting functionality
-📚 Key Learnings
+###📚 Key Learnings
 Connection Pooling
 HikariCP prevents connection exhaustion in production environments. Each database operation borrows a connection from the pool rather than creating new connections.
 Transaction Management
@@ -137,7 +137,7 @@ This is a learning/portfolio project, but I'm open to feedback and suggestions!
 📄 License
 MIT License - Feel free to use this project as a learning resource.
 📞 Contact
-GitHub: @YOUR-USERNAME
+GitHub: @mjbarnette
 LinkedIn: [Your LinkedIn URL]
 Email: your.email@example.com
 
