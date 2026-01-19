@@ -122,35 +122,36 @@ I'm a software engineer with a unique background:
 - 8 years Computer Science education
 - Transitioning to full-time software development
 
-This project demonstrates my ability to:
-Build production-quality code
-Understand systems from the ground up
-Learn and apply modern frameworks
-Write clean, tested, documented code
-📝 Project Evolution
-Phase 1: JDBC Implementation ✅ (Current)
-Understanding foundational database interaction, connection management, and transaction handling.
-Phase 2: Spring Data JPA (Planned)
+**This project demonstrates my ability to:**
+- Build production-quality code
+- Understand systems from the ground up
+- Learn and apply modern frameworks
+- Write clean, tested, documented code
+
+### 📝 Project Evolution
+**Phase 1: JDBC Implementation ✅ (Current)**
+- Understanding foundational database interaction, connection management, and transaction handling.
+**Phase 2: Spring Data JPA (Planned)**
 Migrating to Spring Data JPA to demonstrate understanding of:
-What Spring handles under the hood
-When to use abstractions vs. raw JDBC
-Entity mapping and relationships
-Repository pattern benefits
-Phase 3: REST API (Planned)
+- What Spring handles under the hood
+- When to use abstractions vs. raw JDBC
+- Entity mapping and relationships
+- Repository pattern benefits
+###Phase 3: REST API (Planned)
 Building a RESTful API with Spring Boot:
-RESTful endpoints
-JSON serialization
-Exception handling
-API documentation
-Phase 4: Frontend (Planned)
+- RESTful endpoints
+- JSON serialization
+- Exception handling
+- API documentation
+###Phase 4: Frontend (Planned)
 React-based user interface demonstrating full-stack capabilities.
-🤝 Contributing
+###🤝 Contributing
 This is a learning/portfolio project, but I'm open to feedback and suggestions!
-📄 License
+###📄 License
 MIT License - Feel free to use this project as a learning resource.
-📞 Contact
-GitHub: @mjbarnette
-LinkedIn: [Your LinkedIn URL]
-Email: your.email@example.com
+###📞 Contact
+- GitHub: @mjbarnette
+- LinkedIn: www.linkedin.com/in/michaelbarnette8315a869
+- Email: mjbarnette@live.com
 
 Note: This project is part of my portfolio demonstrating the transition from CS education to professional software engineering. It intentionally shows progression from foundational concepts to framework-based development.
