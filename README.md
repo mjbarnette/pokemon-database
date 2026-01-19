@@ -109,15 +109,19 @@ Initial implementation suffered from N+1 queries in getAllPokemon(). Optimized b
 **Testing Strategy**
 
 Using H2 for tests provides:
-    - Fast execution (in-memory)
-    - Isolation (no shared state between tests)
-    - PostgreSQL compatibility mode
-    - No external dependencies
-🎓 About the Developer
+- Fast execution (in-memory)
+- Isolation (no shared state between tests)
+- PostgreSQL compatibility mode
+- No external dependencies
+
+### 🎓 About the Developer
+
 I'm a software engineer with a unique background:
-14 years retail management (Store Manager, Assistant Manager)
-8 years Computer Science education
-Transitioning to full-time software development
+
+- 14 years retail management (Store Manager, Assistant Manager)
+- 8 years Computer Science education
+- Transitioning to full-time software development
+
 This project demonstrates my ability to:
 Build production-quality code
 Understand systems from the ground up
