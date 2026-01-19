@@ -92,19 +92,27 @@ Transaction rollback scenarios
 Evolution chain retrieval
 Type-based filtering
 Sorting functionality
+
 ###📚 Key Learnings
 Connection Pooling
+
 HikariCP prevents connection exhaustion in production environments. Each database operation borrows a connection from the pool rather than creating new connections.
-Transaction Management
+
+**Transaction Management**
+
 Proper transaction handling ensures data consistency. All related operations (Pokemon + Stats + Moves) succeed together or roll back together.
-N+1 Query Problem
+
+**N+1 Query Problem**
+
 Initial implementation suffered from N+1 queries in getAllPokemon(). Optimized by using JOINs to fetch all related data in a single query.
-Testing Strategy
+
+**Testing Strategy**
+
 Using H2 for tests provides:
-Fast execution (in-memory)
-Isolation (no shared state between tests)
-PostgreSQL compatibility mode
-No external dependencies
+    - Fast execution (in-memory)
+    - Isolation (no shared state between tests)
+    - PostgreSQL compatibility mode
+    - No external dependencies
 🎓 About the Developer
 I'm a software engineer with a unique background:
 14 years retail management (Store Manager, Assistant Manager)
