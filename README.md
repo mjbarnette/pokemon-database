@@ -168,3 +168,11 @@ MIT License - Feel free to use this project as a learning resource.
 - Email: mjbarnette@live.com
 
 Note: This project is part of my portfolio demonstrating the transition from CS education to professional software engineering. It intentionally shows progression from foundational concepts to framework-based development.
+
+### Database Set up
+
+Added Flyway and schema to the project
+
+### Modified JUnit
+
+Modified the JUnit Tests on DAO to account for the new schema in Flyway.

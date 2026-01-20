@@ -12,6 +12,7 @@ import java.sql.SQLException;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -108,26 +109,45 @@ public class JdbcPokemonDao implements PokemonDao {
     
     private void addMoves(Connection conn, int pokemonId, Pokemon newPokemon) throws SQLException
     {   
-        String sqlAddMoves = """
-                             INSERT INTO moves (pokemon_id, name, type, energyType_cost, energyGeneric_cost, damage, description)
-                             VALUES
-                             (?, ?, ?, ?, ?, ?, ?);
-                             """;              
-        try(PreparedStatement stmt5 = conn.prepareStatement(sqlAddMoves))
-        {
-            List<PokemonMove> list = newPokemon.getMoves();
-            for(PokemonMove move : list)
-            {
-                stmt5.setInt(1, pokemonId);
-                stmt5.setString(2, move.getName());
-                stmt5.setInt(3, getTypeId(conn, move.getType().toString()));
-                stmt5.setInt(4, move.getEnergyTypeCost());
-                stmt5.setInt(5, move.getEnergyGenericCost());
-                stmt5.setInt(6, move.getDamage());
-                stmt5.setString(7, move.getDescription());
-                stmt5.executeUpdate();
+        String sqlAddMove = """
+            INSERT INTO moves (pokemon_id, name, damage, description)
+            VALUES (?, ?, ?, ?)
+            RETURNING id
+            """;
+    
+        String sqlAddEnergy = """
+            INSERT INTO move_energy (move_id, energy_type_id, amount)
+            VALUES (?, ?, ?)
+            """;
+
+        for (PokemonMove move : newPokemon.getMoves()) {
+            int moveId;
+
+            // Insert move
+            try (PreparedStatement stmtMove = conn.prepareStatement(sqlAddMove)) {
+                stmtMove.setInt(1, pokemonId);
+                stmtMove.setString(2, move.getName());
+                stmtMove.setInt(3, move.getDamage());
+                stmtMove.setString(4, move.getDescription());
+
+                try (ResultSet rs = stmtMove.executeQuery()) {
+                    rs.next();
+                    moveId = rs.getInt("id");
+                }
             }
-        }       
+
+            // Insert energy costs
+            try (PreparedStatement stmtEnergy = conn.prepareStatement(sqlAddEnergy)) {
+                List<PokemonTypes> list = move.getEnergyTypes();
+                for (PokemonTypes type : list) {
+                    int typeId = getTypeId(conn, type.toString());
+                    stmtEnergy.setInt(1, moveId);
+                    stmtEnergy.setInt(2, typeId);
+                    stmtEnergy.setInt(3, move.getEnergyCost(type));
+                    stmtEnergy.executeUpdate();
+                }
+            }
+        }
     }
     
     private void addEvolution(Connection conn, int pokemonId, Pokemon newPokemon) throws SQLException
@@ -215,34 +235,50 @@ public class JdbcPokemonDao implements PokemonDao {
         return monster;
     }
     
-    private void getMoves(Connection conn, Pokemon poke)throws SQLException
-    {
-        String sql = """
-                    SELECT p.name AS poke_name, m.name AS move_name, t1.type, m.energytype_cost, m.energygeneric_cost, m.damage, m.description
-                     FROM pokemon p
-                     JOIN moves m ON m.pokemon_id = p.id
-                     JOIN pokeTypes t1 ON m.type = t1.id
-                     WHERE p.name =  ?
-                     """;
-        try(PreparedStatement stmt = conn.prepareStatement(sql))
-        {            
-           stmt.setString(1, poke.getName());
-           try(ResultSet rs = stmt.executeQuery())
-            {
-                while(rs.next())
-                {                    
-                    String name = rs.getString("poke_name");
-                    PokemonTypes type = PokemonTypes.valueOf(rs.getString("type"));
-                    int etc = rs.getInt("energytype_cost");
-                    int gec = rs.getInt("energygeneric_cost");
-                    int damage = rs.getInt("damage");
-                    String description = rs.getString("description");
-                    PokemonMove move = new PokemonMove(name, type, etc, gec, damage, description);
-                    poke.addMoves(move);
-                }
-            }
-        }
-    }
+    private void getMoves(Connection conn, Pokemon pokemon) throws SQLException {
+       String sql = """
+           SELECT m.id, m.name, m.damage, m.description,
+                  me.energy_type_id, me.amount, t.type
+           FROM moves m
+           LEFT JOIN move_energy me ON me.move_id = m.id
+           LEFT JOIN pokeTypes t ON me.energy_type_id = t.id
+           WHERE m.pokemon_id = (SELECT id FROM pokemon WHERE name = ?)
+           ORDER BY m.id
+           """;
+
+       try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+           stmt.setString(1, pokemon.getName());
+
+           try (ResultSet rs = stmt.executeQuery()) {
+               Map<Integer, PokemonMove> movesMap = new HashMap<>();
+
+               while (rs.next()) {
+                   int moveId = rs.getInt("id");
+
+                   // Get or create move
+                   PokemonMove move = movesMap.get(moveId);
+                   if (move == null) {
+                       move = new PokemonMove(
+                           rs.getString("name"),
+                           rs.getInt("damage"),
+                           rs.getString("description")
+                       );
+                       movesMap.put(moveId, move);
+                   }
+
+                   // Add energy cost (if exists)
+                   String energyType = rs.getString("type");
+                   if (energyType != null) {
+                       int amount = rs.getInt("amount");
+                       move.addEnergyCost(PokemonTypes.valueOf(energyType), amount);
+                   }
+               }
+
+               // Add all moves to pokemon
+               movesMap.values().forEach(pokemon::addMoves);
+           }
+       }
+   }
     
     @Override
     public Pokemon findByName(String name) throws SQLException {
@@ -260,20 +296,21 @@ public class JdbcPokemonDao implements PokemonDao {
     public List<Pokemon> getAllPokemon(SortOrder orderBy) throws SQLException {
        
         String sql = """
-                     SELECT p.id, p.name AS pokemon_name, p.imagefile AS pokemon_image, 
-                                   e.current_stage, s.hit_points AS pokemon_hp, 
-                                   t1.type AS pokemon_type, t2.type AS pokemon_weak, 
-                                   s.retreat_cost AS pokemon_rc,
-                                   m.name AS move_name, mt.type AS move_type, 
-                                   m.energytype_cost, m.energygeneric_cost, 
-                                   m.damage, m.description
+                    SELECT p.id, p.name AS pokemon_name, p.imagefile AS pokemon_image, 
+                            		e.current_stage, s.hit_points AS pokemon_hp, 
+                            		t1.type AS pokemon_type, t2.type AS pokemon_weak, 
+                            		s.retreat_cost AS pokemon_rc,
+                            		m1.name AS move_name, m1.damage, 
+                            		m1.description, m3.type AS energy_type,
+                            		m2.amount
                             FROM pokemon p
                             JOIN pokeStats s ON s.pokemon_id = p.id
                             JOIN pokeTypes t1 ON s.type_id = t1.id
                             JOIN pokeTypes t2 ON s.weakness_id = t2.id
                             JOIN pokeEvolutions e ON e.pokemon_id = p.id
-                            LEFT JOIN moves m ON m.pokemon_id = p.id
-                            LEFT JOIN pokeTypes mt ON m.type = mt.id
+                            LEFT JOIN moves m1 ON p.id = m1.pokemon_id
+                            LEFT JOIN move_energy m2 ON m1.id = m2.move_id
+                            LEFT JOIN pokeTypes m3 ON m2.energy_type_id = m3.id
                             ORDER BY """ + " " + orderBy.toString();
         try (Connection conn = getConnection();
             PreparedStatement stmt = conn.prepareStatement(sql);
@@ -304,17 +341,28 @@ public class JdbcPokemonDao implements PokemonDao {
                 pokemonMap.put(id, pokemon);
             }
           
-            String moveName = rs.getString("move_name");
-            if (moveName != null) {
-                PokemonMove move = new PokemonMove(
-                    moveName,
-                    PokemonTypes.valueOf(rs.getString("move_type")),
-                    rs.getInt("energytype_cost"),
-                    rs.getInt("energygeneric_cost"),
+            String moveName = rs.getString("move_name");           
+            PokemonMove move = null;
+            for(PokemonMove m : pokemon.getMoves())
+            {
+                if(m.getName().equals(moveName))
+                {                    
+                    move = m;
+                }
+            }                
+            if (moveName != null && move == null) {
+                move = new PokemonMove(
+                    moveName,                                       
                     rs.getInt("damage"),
                     rs.getString("description")
                 );
-                pokemon.addMoves(move);
+                move.addEnergyCost(PokemonTypes.valueOf(rs.getString("energy_type")), rs.getInt("amount"));
+                pokemon.addMoves(move);                
+            }
+            else if(move != null)
+            {
+                System.out.println(move);
+                move.addEnergyCost(PokemonTypes.valueOf(rs.getString("energy_type")), rs.getInt("amount"));
             }
         }
         return new ArrayList<>(pokemonMap.values());
@@ -324,20 +372,22 @@ public class JdbcPokemonDao implements PokemonDao {
     public List<Pokemon> getAllPokemonOfType(PokemonTypes type) throws SQLException {       
         String sql = """
                     SELECT p.id, p.name AS pokemon_name, p.imagefile AS pokemon_image, 
-                            e.current_stage, s.hit_points AS pokemon_hp, 
-                            t1.type AS pokemon_type, t2.type AS pokemon_weak, 
-                            s.retreat_cost AS pokemon_rc,
-                            m.name AS move_name, mt.type AS move_type, 
-                            m.energytype_cost, m.energygeneric_cost, 
-                            m.damage, m.description
+                    		e.current_stage, s.hit_points AS pokemon_hp, 
+                    		t1.type AS pokemon_type, t2.type AS pokemon_weak, 
+                    		s.retreat_cost AS pokemon_rc,
+                    		m1.name AS move_name, m1.damage, 
+                    		m1.description, m3.type AS energy_type,
+                    		m2.amount
                     FROM pokemon p
                     JOIN pokeStats s ON s.pokemon_id = p.id
                     JOIN pokeTypes t1 ON s.type_id = t1.id
                     JOIN pokeTypes t2 ON s.weakness_id = t2.id
                     JOIN pokeEvolutions e ON e.pokemon_id = p.id
-                    LEFT JOIN moves m ON m.pokemon_id = p.id
-                    LEFT JOIN pokeTypes mt ON m.type = mt.id
-                    WHERE t1.type = ? """;                    
+                    LEFT JOIN moves m1 ON p.id = m1.pokemon_id
+                    LEFT JOIN move_energy m2 ON m1.id = m2.move_id
+                    LEFT JOIN pokeTypes m3 ON m2.energy_type_id = m3.id
+                    WHERE t1.type = ? """; 
+       
         try (Connection conn = getConnection();
             PreparedStatement stmt = conn.prepareStatement(sql))
             {

@@ -1,7 +1,4 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/UnitTests/JUnit5TestClass.java to edit this template
- */
+
 package io.github.mjbarnette.pokemon.databse;
 
 import java.io.IOException;
@@ -66,7 +63,25 @@ public class JdbcPokemonDaoTest {
     public void testSave() throws Exception {
         System.out.println("save");
         Pokemon koraidon = new Pokemon("Koraidon", "Koraidon.png", PokemonTypes.Fighting, 130, EvolutionStage.Basic, PokemonTypes.Psychic, 2);
+        PokemonMove move1 = new PokemonMove("Claw Slash", 70, null);
+        move1.addEnergyCost(PokemonTypes.Normal, 3);
+        PokemonMove move2 = new PokemonMove("Rampaging Fang", 190, "Discard 3 Energy from this Pokemon.");
+        move2.addEnergyCost(PokemonTypes.Fighting, 3);
+        move2.addEnergyCost(PokemonTypes.Normal, 1);
+        koraidon.addMoves(move1);
+        koraidon.addMoves(move2);
         instance.save(koraidon);
+        Pokemon meditite = new Pokemon("Meditite", "Meditite.png", PokemonTypes.Fighting, 60, EvolutionStage.Basic, PokemonTypes.Psychic, 1);
+        move1 = new PokemonMove("Feint", 10, "This attacks damage isnt affected by Resistance.");
+        move1.addEnergyCost(PokemonTypes.Fighting, 1);
+        meditite.addMoves(move1);
+        instance.save(meditite);
+        Pokemon Medicham = new Pokemon("Medicham", "Medicham.png", PokemonTypes.Fighting, 90, EvolutionStage.Stage1, PokemonTypes.Psychic, 1);
+        move1 = new PokemonMove("Acu-Punch-Ture", 30, "Choose 1 attack ect...");
+        move1.addEnergyCost(PokemonTypes.Fighting, 1);
+        move2 = new PokemonMove("Kick Shot", 90, "Flip a coin");
+        move2.addEnergyCost(PokemonTypes.Fighting, 1);
+        instance.save(Medicham); 
         // TODO review the generated test code and remove the default call to fail.
         //fail("The test case is a prototype.");
     }
@@ -80,7 +95,7 @@ public class JdbcPokemonDaoTest {
         System.out.println("findByName: Koraidon");        
         Pokemon result = instance.findByName("Koraidon");
         assertNotNull(result);
-        assertEquals("Koraidon", result.getName());
+        assertEquals("Koraidon", result.getName());        
         // TODO review the generated test code and remove the default call to fail.
         //fail("The test case is a prototype.");
     }
@@ -93,7 +108,7 @@ public class JdbcPokemonDaoTest {
     public void testGetAllPokemon() throws Exception {
         System.out.println("getAllPokemon");
         SortOrder orderBy = SortOrder.pokemon_name;        
-        int expResult = 9;
+        int expResult = 3;
         List<Pokemon> result = instance.getAllPokemon(orderBy);
         assertEquals(expResult, result.size());
         // TODO change test later to test more accurately.
@@ -108,8 +123,10 @@ public class JdbcPokemonDaoTest {
     public void testGetAllPokemonOfType() throws Exception {
         System.out.println("getAllPokemonOfType");
         PokemonTypes type = PokemonTypes.Fighting;       
-        int expResult = 4;
+        int expResult = 3;
         List<Pokemon> result = instance.getAllPokemonOfType(type);
+        System.out.println(result.toString());
+        System.out.println(result.get(0).getMoves());
         assertEquals(expResult, result.size());
         // TODO change test later to test more accurately.
         ///fail("The test case is a prototype.");
@@ -156,10 +173,8 @@ public class JdbcPokemonDaoTest {
     @Order(5)
     public void testSetEvolution() throws Exception {
         System.out.println("setEvolution");         
-        Pokemon current = new Pokemon("Meditite", "Meditite.png", PokemonTypes.Fighting, 60, EvolutionStage.Basic, PokemonTypes.Psychic, 1);
-        instance.save(current);
-        Pokemon nextStage = new Pokemon("Medicham", "Medicham.png", PokemonTypes.Fighting, 90, EvolutionStage.Stage1, PokemonTypes.Psychic, 1);
-        instance.save(nextStage);        
+        Pokemon current = instance.findByName("Meditite");        
+        Pokemon nextStage = instance.findByName("Medicham");               
         instance.setEvolution(current, nextStage);
         // TODO review the generated test code and remove the default call to fail.
         //fail("The test case is a prototype.");
