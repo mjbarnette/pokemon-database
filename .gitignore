@@ -59,6 +59,7 @@ Thumbs.db
 # Application specific
 # Add any database credentials or sensitive files here
 application.properties
+application-testing.properties
 database.properties
 db.properties
 db-test.properties

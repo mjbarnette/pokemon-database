@@ -1,6 +1,7 @@
 /**
- * Author:  mjbar
+ * Author:  mjbarnette
  * Created: Jan 19, 2026
+ * V1__initial_schema.sql
  */
 -- Complete initial schema with correct design
 CREATE TABLE pokeTypes (

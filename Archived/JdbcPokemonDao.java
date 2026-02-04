@@ -323,7 +323,7 @@ public class JdbcPokemonDao implements PokemonDao {
     private List<Pokemon> buildPokemonList(ResultSet rs) throws SQLException {
         
         Map<Integer, Pokemon> pokemonMap = new LinkedHashMap<>();
-
+        
         while (rs.next()) {
             int id = rs.getInt("id");
             Pokemon pokemon = pokemonMap.get(id);
@@ -340,7 +340,7 @@ public class JdbcPokemonDao implements PokemonDao {
                 );
                 pokemonMap.put(id, pokemon);
             }
-          
+            
             String moveName = rs.getString("move_name");           
             PokemonMove move = null;
             for(PokemonMove m : pokemon.getMoves())
@@ -360,8 +360,7 @@ public class JdbcPokemonDao implements PokemonDao {
                 pokemon.addMoves(move);                
             }
             else if(move != null)
-            {
-                System.out.println(move);
+            {                
                 move.addEnergyCost(PokemonTypes.valueOf(rs.getString("energy_type")), rs.getInt("amount"));
             }
         }

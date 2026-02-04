@@ -1,55 +1,115 @@
-package io.github.mjbarnette.pokemon.databse;
+package io.github.mjbarnette.pokemon.database.entity;
 
-import java.util.ArrayList;
+import io.github.mjbarnette.pokemon.database.value.PokemonTypes;
+import jakarta.persistence.CollectionTable;
+import jakarta.persistence.Column;
+import jakarta.persistence.ElementCollection;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.MapKeyColumn;
+import jakarta.persistence.MapKeyEnumerated;
+import java.util.Collections;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.experimental.Accessors;
 
-public class PokemonMove {
-
-    private String name;   
+@Accessors(chain = true)
+@Entity
+public class Moves {
+    
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;   
+        
+    @ManyToOne
+    @Getter
+    @JoinColumn(name = "pokemon_id", nullable = false)
+    private Pokemon pokemon;
+        
+    @Getter
+    private String name;
+        
+    @Getter
     private int damage;
+        
+    @Getter
     private String description;
-    private Map<PokemonTypes, Integer> energyCost;
     
-    public PokemonMove(String name, int damge, String description)
+    @ElementCollection
+    @CollectionTable(
+        name = "move_energy",
+        joinColumns = @JoinColumn(name = "move_id")
+    )
+    @MapKeyEnumerated(EnumType.STRING)
+    @MapKeyColumn(name = "energy_type")
+    @Column(name = "amount")
+    @Setter(AccessLevel.PRIVATE)
+    private Map<PokemonTypes, Integer> energyCost = new HashMap<>();
+    
+    protected Moves() {} //JPA only
+    
+    public Moves(Pokemon pokemon, String name, int damage, String description)
     {
-        this.name = name;           
+        this.pokemon = pokemon;
+        this.name = name;
         this.damage = damage;
+        if(description == null)
+        {
+            description = "";
+        }
         this.description = description;
-        energyCost = new HashMap<>();
-    }
+    }    
     
-    public String getName() {
-    return name;
-    }
-    
-    public int getDamage() {
-        return damage;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-    
-    public List<PokemonTypes> getEnergyTypes()
+    public Set<PokemonTypes> getEnergyTypes()
     {
-         return List.copyOf(energyCost.keySet());
+        return Collections.unmodifiableSet(energyCost.keySet());        
     }
     
-    public int getEnergyCost(PokemonTypes type)
+    public int getEnergyTypeCost(PokemonTypes type)
     {
         return energyCost.getOrDefault(type, 0);
     }
     
-    public void addEnergyCost(PokemonTypes type, Integer cost)
+    public void setEnergyCost(PokemonTypes type, Integer cost)
     {
         this.energyCost.put(type, cost);
     }
     
+    @Override
     public String toString()
-    {
-        return name + energyCost.keySet();
+    {        
+        String str = "Title: " + name + "\n" 
+                + "Damage: " + damage + "\n"
+                + "Description: " + description + "\n";
+        Set<PokemonTypes> list = energyCost.keySet();
+        for(PokemonTypes type : list)
+        {
+            str += "EnergyType: " + type + " -> " + energyCost.get(type) + "\n";
+        }        
+        return str;
     }
+    
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) 
+            return true;
+        if (!(o instanceof Moves)) 
+            return false;
+        return id != null && id.equals(((Moves) o).id);
+    }
+
+    @Override
+    public int hashCode() {
+        return getClass().hashCode();
+    }    
+    
 }

@@ -1,4 +1,4 @@
-package io.github.mjbarnette.pokemon.databse;
+package io.github.mjbarnette.pokemon.database.value;
 
 
 public enum SortOrder {

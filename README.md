@@ -1,35 +1,43 @@
 # Pokemon Database Manager
 
-A comprehensive Pokemon database management system demonstrating the evolution from foundational JDBC to modern Spring frameworks.
+A Java backend project demonstrating the evolution from raw JDBC-based data access to a modern Spring-powered architecture.
+
+---
 
 ## 🎯 Project Purpose
 
-This project showcases professional Java development practices and my transition from Computer Science education to software engineering. It intentionally demonstrates progression from low-level database interaction to framework-based development.
+This project intentionally showcases the progression of backend development techniques:
+- Starting with manual JDBC and transaction management
+- Transitioning to Spring Data JPA and repository abstractions
+- Laying the groundwork for a REST API and frontend UI
 
+The goal is to demonstrate not just *how* to use frameworks, but *what problems they solve* and *what they replace*.
+
+---
 ## 🚀 Technologies Used
 
-### Current Implementation (Phase 1)
-- **Java 17** - Modern Java features and syntax
-- **JDBC** - Direct database interaction and connection management
-- **PostgreSQL 16** - Production-grade relational database
-- **HikariCP 5.1.0** - High-performance connection pooling
-- **Maven** - Dependency management and build automation
-- **JUnit 5** - Unit testing framework
+### Current Stack
+- Java 17
+- Spring Boot
+- Spring Data JPA
+- PostgreSQL 16
+- HikariCP
+- Maven
+- JUnit 5
+- Flyway
 
-### Planned Implementations
-- **Phase 2:** Spring Data JPA - Entity mapping and repository pattern
-- **Phase 3:** Spring Boot REST API - RESTful web services
-- **Phase 4:** React Frontend - Modern web interface
+---
 
 ## 📋 Features
 
-- ✅ Complete CRUD operations for Pokemon
-- ✅ Manage Pokemon stats, moves, types, and evolutions
-- ✅ Query Pokemon by type and name
-- ✅ Retrieve complete evolution chains
-- ✅ Configurable sort ordering
-- ✅ Transaction management with rollback support
-- ✅ Connection pooling for scalability
+- CRUD operations for Pokémon
+- Pokémon stats, moves, types, and evolution chains
+- Transaction-safe updates
+- Configurable sorting and filtering
+- Fully tested service layer
+- Database migrations via Flyway
+
+---
 
 ## 🏗️ Architecture
 
@@ -40,122 +48,95 @@ This project showcases professional Java development practices and my transition
 - `pokeTypes` - Type reference data
 - `pokeEvolutions` - Evolution chain relationships
 
-### Design Patterns
-- **DAO Pattern** - Data access abstraction
-- **Connection Pooling** - Resource management
-- **Transaction Management** - Data consistency
-- **Builder Pattern** - Test data creation
+### Design Principles
+- Clear separation of concerns
+- Service-layer business logic
+- Repository-based persistence
+- Transactional consistency
 
-## 🛠️ Setup Instructions
+---
+
+## 📚 Key Learnings
+
+### Connection Pooling
+HikariCP ensures scalable, efficient database access without connection exhaustion.
+
+### Transaction Management
+All related operations (Pokémon, stats, moves, evolutions) succeed or roll back as a single unit.
+
+### N+1 Query Problem
+Early implementations revealed N+1 issues, resolved through proper fetch strategies and query design.
+
+### Testing Strategy
+- H2 in-memory database
+- Transaction rollback per test
+- Repeatable, isolated test execution
+
+---
+
+### 🛠️ Setup Instructions
 
 ### Prerequisites
-- Java 17 or higher
-- PostgreSQL 16 or higher
+- Java 17+
+- PostgreSQL 16+
 - Maven 3.8+
 
 ### Installation
 
-1. **Clone the repository**
-   ```bash
-   git clone https://github.com/YOUR-USERNAME/pokemon-database.git
-   cd pokemon-database
-
-Set up PostgreSQL database
-
- createdb pokemon_db
-psql -d pokemon_db -f src/main/resources/schema.sql
-
-
-Configure database connection
-
-
-Update credentials in test files (or use environment variables)
-Default: localhost:5432, user: postgres
-Build the project
-
- mvn clean install
-
-
-Run tests
-
- mvn test
-
+```bash
+git clone https://github.com/mjbarnette/pokemon-database.git
+cd pokemon-database
+createdb pokemon_db
+mvn clean test
 
 ### Testing
 The project uses JUnit 5 with H2 in-memory database for isolated, repeatable tests.
 Run tests:
 mvn test
 
-### Test coverage includes:
-CRUD operations
-Transaction rollback scenarios
-Evolution chain retrieval
-Type-based filtering
-Sorting functionality
+### :test_tube: Testing
 
-###📚 Key Learnings
-Connection Pooling
+Service-layer integration tests using JUnit 5
 
-HikariCP prevents connection exhaustion in production environments. Each database operation borrows a connection from the pool rather than creating new connections.
+In-memory H2 database (PostgreSQL compatibility mode)
 
-**Transaction Management**
-
-Proper transaction handling ensures data consistency. All related operations (Pokemon + Stats + Moves) succeed together or roll back together.
-
-**N+1 Query Problem**
-
-Initial implementation suffered from N+1 queries in getAllPokemon(). Optimized by using JOINs to fetch all related data in a single query.
-
-**Testing Strategy**
-
-Using H2 for tests provides:
-- Fast execution (in-memory)
-- Isolation (no shared state between tests)
-- PostgreSQL compatibility mode
-- No external dependencies
+Each test runs in a clean transactional context
 
 ### 🎓 About the Developer
 
-I'm a software engineer with a unique background:
-
-- 14 years retail management (Store Manager, Assistant Manager)
-- 8 years Computer Science education
-- Transitioning to full-time software development
+- 14 years retail management
+- 8 years teaching Computer Science
+- Transitioning to professional software engineering
 
 **This project demonstrates my ability to:**
-- Build production-quality code
-- Understand systems from the ground up
-- Learn and apply modern frameworks
-- Write clean, tested, documented code
+- Design maintainable systems
+- Understand frameworks at a deep level
+- Write clean, tested, production-quality code
+
+---
 
 ### 📝 Project Evolution
-**Phase 1: JDBC Implementation ✅ (Current)**
+**Phase 1: JDBC Implementation ✅ (Completed)**
 
-- Understanding foundational database interaction, connection management, and transaction handling.
+- Manual SQL
+- Explicit transaction handling
+- Connection pooling
 
-**Phase 2: Spring Data JPA (Planned)**
+**Phase 2: Spring Data JPA (Completed)**
+- Entity mapping
+- Repositories
+- Service-layer abstraction
+- JPA-focused testing
 
-Migrating to Spring Data JPA to demonstrate understanding of:
-- What Spring handles under the hood
-- When to use abstractions vs. raw JDBC
-- Entity mapping and relationships
-- Repository pattern benefits
+**Phase 3: REST API (Current)**
+- REST endpoints
+-JSON serialization
 
-**Phase 3: REST API (Planned)**
+**Phase 4: Frontend (Planned)**
 
-Building a RESTful API with Spring Boot:
-- RESTful endpoints
-- JSON serialization
-- Exception handling
-- API documentation
+- React-based UI
 
-###Phase 4: Frontend (Planned)
-
-React-based user interface demonstrating full-stack capabilities.
-
-###🤝 Contributing
-
-This is a learning/portfolio project, but I'm open to feedback and suggestions!
+---
 
 ###📄 License
 
@@ -176,3 +157,17 @@ Added Flyway and schema to the project
 ### Modified JUnit
 
 Modified the JUnit Tests on DAO to account for the new schema in Flyway.
+
+### Updated to JPA
+
+- Updated Schema to account for improvements.
+- Created Entities Pokemon, Pokestats, Pokeevolutions, Moves
+- Created Repositories for All Entities
+- Created a Service class for Pokemon
+- Improved Application Properites to remove noise from output during debugging
+
+### Completed Initial Testing of JPA
+
+- Created a JUnit Test for the Pokemon Service Class.
+- Created Application and Dataloader to test loading single Pokemon
+- This Dataloader enable viewing of information in Tables in PGAdmin to verify correct storing.
