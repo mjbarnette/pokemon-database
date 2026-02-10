@@ -6,16 +6,15 @@ import io.github.mjbarnette.pokemon.database.entity.Pokemon;
 import io.github.mjbarnette.pokemon.database.value.EvolutionStage;
 import io.github.mjbarnette.pokemon.database.value.PokemonTypes;
 import jakarta.transaction.Transactional;
+import java.io.File;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
 import lombok.extern.slf4j.Slf4j;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
+import org.junit.jupiter.api.DisplayName;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
@@ -35,6 +34,7 @@ public class PokemonServiceTest {
      * Test of getAllPokemon method, of class PokemonService.
      */
     @Test
+    @DisplayName("Creating objects out of All Pokemon")
     public void testGetAllPokemon() {
         int startSize = instance.getAllPokemon().size();
         Pokemon poke1 = instance.createPokemon("Test1", PokemonTypes.Normal, 50, PokemonTypes.Fairy, 1, EvolutionStage.Basic);
@@ -52,14 +52,15 @@ public class PokemonServiceTest {
      * Test of getPokemonByName method, of class PokemonService.
      */
     @Test
-    public void testGetPokemonByName() {
-        log.info("Test getPokemonByName");
+    @DisplayName("Get Pokemon by Name and creating Objects of them")
+    public void testGetPokemonByName() {       
         Pokemon poke1 = instance.createPokemon("Test1", PokemonTypes.Normal, 50, PokemonTypes.Fairy, 1, EvolutionStage.Basic);
         log.info("Pokemon add {}", poke1.getName());
         Pokemon poke2 = instance.createPokemon("Test2", PokemonTypes.Normal, 100, PokemonTypes.Fairy, 2, EvolutionStage.Stage1);
         log.info("Pokemon add {}", poke2.getName());
         Pokemon poke3 = instance.createPokemon("Test3", PokemonTypes.Normal, 150, PokemonTypes.Fairy, 3, EvolutionStage.Stage2);                     
         log.info("Pokemon add {}", poke3.getName());
+        Pokemon poke4 = instance.createPokemon("Skiddo", PokemonTypes.Grass, 70, PokemonTypes.Fire, 1, EvolutionStage.Basic);        
         String name = "Test1"; 
         Pokemon result = instance.getPokemonByName(name);
         log.info("{} hitpoints test", name);        
@@ -192,5 +193,18 @@ public class PokemonServiceTest {
         assertNotNull(result1.getStats());
         assertFalse(result2.getMoves().isEmpty());
         assertFalse(result1.getEvolutions().isEmpty());
+    }
+    
+    @Test
+    public void testLoadCsvFiles() throws IOException
+    {
+        File pokemon = new File("src/test/java/io/github/mjbarnette/pokemon/database/testfiles/Pokemon.csv");        
+        File moves = new File("src/test/java/io/github/mjbarnette/pokemon/database/testfiles/Moves.csv");
+        File evolutions = new File("src/test/java/io/github/mjbarnette/pokemon/database/testfiles/Evolutions.csv");
+        instance.loadCsvFiles(pokemon, moves, evolutions);
+        Pokemon poke1 = instance.getPokemonByName("Pikachu");
+        assertEquals(60, poke1.getStats().getHitPoints());
+        assertEquals("Pikachu.jpg", poke1.getImagefile());
+        assertFalse(poke1.getMoves().isEmpty());
     }
 }

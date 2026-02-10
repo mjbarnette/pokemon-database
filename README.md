@@ -88,6 +88,7 @@ git clone https://github.com/mjbarnette/pokemon-database.git
 cd pokemon-database
 createdb pokemon_db
 mvn clean test
+```
 
 ### Testing
 The project uses JUnit 5 with H2 in-memory database for isolated, repeatable tests.
@@ -106,7 +107,7 @@ Each test runs in a clean transactional context
 
 - 14 years retail management
 - 8 years teaching Computer Science
-- Transitioning to professional software engineering
+- Experienced technical educator and team leader transitioning into professional software engineering roles with a focus on system design, quality, and maintainability.
 
 **This project demonstrates my ability to:**
 - Design maintainable systems
@@ -130,7 +131,7 @@ Each test runs in a clean transactional context
 
 **Phase 3: REST API (Current)**
 - REST endpoints
--JSON serialization
+- JSON serialization
 
 **Phase 4: Frontend (Planned)**
 
@@ -150,24 +151,17 @@ MIT License - Feel free to use this project as a learning resource.
 
 Note: This project is part of my portfolio demonstrating the transition from CS education to professional software engineering. It intentionally shows progression from foundational concepts to framework-based development.
 
-### Database Set up
+### Project Milestones:
 
-Added Flyway and schema to the project
+- Designed and iterated on a normalized database schema to support Pokémon, stats, moves, and evolution chains.
+- Migrated from raw JDBC to Spring Data JPA, creating entities, repositories, and a service layer aligned with the domain model.
+- Implemented comprehensive JUnit testing across repositories, services, DTOs, and controllers to verify data flow, business rules, and transactional behavior.
+- Introduced immutable DTOs to clearly separate domain entities from external data contracts.
+- Developed REST controllers as a thin orchestration layer that maps HTTP requests to DTOs and delegates validated operations to the service layer.
+- Enforced separation of concerns to prevent controller bloat and ensure business logic remains independently testable.
 
-### Modified JUnit
 
-Modified the JUnit Tests on DAO to account for the new schema in Flyway.
+### Next Steps
 
-### Updated to JPA
-
-- Updated Schema to account for improvements.
-- Created Entities Pokemon, Pokestats, Pokeevolutions, Moves
-- Created Repositories for All Entities
-- Created a Service class for Pokemon
-- Improved Application Properites to remove noise from output during debugging
-
-### Completed Initial Testing of JPA
-
-- Created a JUnit Test for the Pokemon Service Class.
-- Created Application and Dataloader to test loading single Pokemon
-- This Dataloader enable viewing of information in Tables in PGAdmin to verify correct storing.
+- Refactor service-layer error handling to return explicit, domain-specific outcomes for common data integrity issues (such as duplicate entities or missing dependencies).
+- Leverage enum-based result types to enable consistent logging, clearer diagnostics, and improved user feedback in future UI implementations.

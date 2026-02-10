@@ -72,7 +72,14 @@
             <version>1.18.38</version>
             <scope>provided</scope>
         </dependency>
-
+        
+        <!-- CVS Parse Library -->
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-csv</artifactId>
+            <version>1.10.0</version>
+        </dependency>        
+        
   </dependencies>
 
     

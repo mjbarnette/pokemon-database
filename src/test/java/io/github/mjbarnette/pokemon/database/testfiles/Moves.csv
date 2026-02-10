@@ -1,0 +1,11 @@
+Pokemon  Name,Title,Damage,Description,Energy Types,Costs
+Pikachu,Energize,0,Attach a Electric Energy card from your discard pile to this Pokemon.,Electric,1
+Pikachu,ThunderBolt,80,Discard all Energy attached to this Pokemon,Electric Normal,1 2
+Indeedee,Helping Hand,0,Search your deck for a basic Energy card and attach it to 1 of your Benched Pokemon. Then shuffle your deck.,Normal,1
+Indeedee,Psychic,20,This attack does 20 more damage for each Energy attached to your opponent's Active Pokemon.,Normal,2
+Yanma,Tackle,10,None,Grass,1
+Yanma,Wing Attack,30,None,Grass Normal,1 1
+Yanmega,Bug Bite,30,None,Grass,1
+Yanmega,Nosedive,120,This Pokemon also does 30 damage to itself,Grass Normal,1 1
+Venusaur V,Leaf Drain,50,Heal 30 damage from this Pokemon,Grass Normal,1 1
+Venusaur V,Double-Edge,190,This Pokemon also does 30 damage to itself,Grass Normal,2 1

@@ -4,7 +4,6 @@ import io.github.mjbarnette.pokemon.database.value.EvolutionStage;
 import io.github.mjbarnette.pokemon.database.value.PokemonTypes;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
-import jakarta.persistence.Embeddable;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -14,6 +13,7 @@ import jakarta.persistence.OneToOne;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -47,7 +47,12 @@ public class Pokemon {
     
     protected Pokemon() {} //JPA only
     
-    public Pokemon(String name, PokemonTypes type, int hitPoints, PokemonTypes weakness, int retreatCost, EvolutionStage stage)
+    public Pokemon(String name, 
+            PokemonTypes type, 
+            int hitPoints, 
+            PokemonTypes weakness, 
+            int retreatCost, 
+            EvolutionStage stage)
     {
         this.name = name;
         this.stats = new Pokestats(this, type, hitPoints, weakness, retreatCost);
@@ -55,7 +60,7 @@ public class Pokemon {
         evolutions.add(evolution);
     }    
     
-    public void addMoves(String moveName, int damage, String description, HashMap<PokemonTypes, Integer> cost)
+    public void addMoves(String moveName, int damage, String description, Map<PokemonTypes, Integer> cost)
     {
         Moves newMove = new Moves(this, moveName, damage, description);
         Set<PokemonTypes> types = cost.keySet();
@@ -76,8 +81,7 @@ public class Pokemon {
                return;
            }
        }
-       evolutions.add(new Pokeevolutions(this, next));
-       
+       evolutions.add(new Pokeevolutions(this, next));       
     }
     
     public EvolutionStage getCurrentStage()

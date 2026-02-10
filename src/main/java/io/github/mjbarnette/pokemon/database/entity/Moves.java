@@ -69,6 +69,11 @@ public class Moves {
         this.description = description;
     }    
     
+    public Map<PokemonTypes, Integer> getEnergyCost()
+    {
+        return Collections.unmodifiableMap(energyCost);
+    }
+    
     public Set<PokemonTypes> getEnergyTypes()
     {
         return Collections.unmodifiableSet(energyCost.keySet());        

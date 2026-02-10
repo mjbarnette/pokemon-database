@@ -5,12 +5,17 @@ import io.github.mjbarnette.pokemon.database.entity.Moves;
 import io.github.mjbarnette.pokemon.database.entity.Pokeevolutions;
 import io.github.mjbarnette.pokemon.database.entity.Pokemon;
 import io.github.mjbarnette.pokemon.database.repository.PokemonRepository;
+import io.github.mjbarnette.pokemon.database.utility.CsvUtility;
 import io.github.mjbarnette.pokemon.database.value.EvolutionStage;
 import io.github.mjbarnette.pokemon.database.value.PokemonTypes;
 import jakarta.transaction.Transactional;
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -48,11 +53,18 @@ public class PokemonService {
         pokemonRepo.save(current);
     }
     
-    public Pokemon createPokemon(String name, PokemonTypes type, int hitPoints, PokemonTypes weakness, int retreatCost, EvolutionStage stage)
+    public Pokemon createPokemon(String name, 
+            PokemonTypes type, 
+            int hitPoints, 
+            PokemonTypes weakness, 
+            int retreatCost, 
+            EvolutionStage stage)
     {
-        Pokemon pokemon = new Pokemon(name, type, hitPoints, weakness, retreatCost, stage); 
-        this.pokemonRepo.save(pokemon);        
-        return pokemon;
+        return pokemonRepo.findByName(name).orElseGet(() -> {
+            Pokemon pokemon = new Pokemon(name, type, hitPoints, weakness, retreatCost, stage);
+            log.info("New pokemon added {}", pokemon.getName());
+            return pokemonRepo.save(pokemon);
+        });
     }
     
     public void addImage(String name, String image)
@@ -63,12 +75,33 @@ public class PokemonService {
        this.pokemonRepo.save(pokemon);
     }
     
-    public void addNewMove(String pokemonName, String moveName, int damage, String description, HashMap<PokemonTypes, Integer> cost)
+    public void addNewMove(String pokemonName, String moveName, int damage, String description, Map<PokemonTypes, Integer> cost)
     {        
         Pokemon pokemon = pokemonRepo.findByName(pokemonName)
-                .orElseThrow(() -> new RuntimeException("Pokemon not found"));
-        pokemon.addMoves(moveName, damage, description, cost);
-        this.pokemonRepo.save(pokemon);
+                .orElseThrow(() -> new RuntimeException("Pokemon not found"));       
+            pokemon.addMoves(moveName, damage, description, cost);
+            this.pokemonRepo.save(pokemon);        
+    }
+    
+    public void loadCsvFiles(File pokemon, File moves, File evolutions) throws IOException
+    {        
+        List<Pokemon> list = CsvUtility.parseCsvFiles(pokemon, moves, evolutions);
+        
+        Set<String> existingNames = pokemonRepo.findAllNames();
+        
+        List<Pokemon> toSave = new ArrayList<>();
+        for(Pokemon p : list)
+        {
+            if(!existingNames.contains(p.getName()))
+            {
+                toSave.add(p);
+            }
+            else
+            {
+                log.info("Skipping duplicate Pokemon: {}", p.getName());
+            }
+        }          
+        pokemonRepo.saveAll(toSave);
     }
     
     @Transactional
