@@ -9,7 +9,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface MovesRepository extends JpaRepository<Moves, Long> {
     
-    Optional<Moves> findByName(String name);
+    Optional<Moves> findByNameAndPokemon_Name(String moveName, String pokemonName);
     
     Set<Moves> findByPokemonName(String name);
     

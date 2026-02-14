@@ -129,9 +129,11 @@ Each test runs in a clean transactional context
 - Service-layer abstraction
 - JPA-focused testing
 
-**Phase 3: REST API (Current)**
-- REST endpoints
-- JSON serialization
+**Phase 3: REST API (Completed)**
+-  Implemented RESTful controllers following layered architecture principles
+- Introduced DTO mapping to isolate domain entities from API contracts
+- Added structured exception handling with consistent JSON error responses
+- Verified request/response behavior using @WebMvcTest controller tests
 
 **Phase 4: Frontend (Planned)**
 
@@ -139,11 +141,11 @@ Each test runs in a clean transactional context
 
 ---
 
-###📄 License
+### 📄 License
 
 MIT License - Feel free to use this project as a learning resource.
 
-###📞 Contact
+### 📞 Contact
 
 - GitHub: @mjbarnette
 - LinkedIn: www.linkedin.com/in/michaelbarnette8315a869
@@ -155,13 +157,15 @@ Note: This project is part of my portfolio demonstrating the transition from CS 
 
 - Designed and iterated on a normalized database schema to support Pokémon, stats, moves, and evolution chains.
 - Migrated from raw JDBC to Spring Data JPA, creating entities, repositories, and a service layer aligned with the domain model.
-- Implemented comprehensive JUnit testing across repositories, services, DTOs, and controllers to verify data flow, business rules, and transactional behavior.
+- Implemented layered JUnit testing (repository, service, DTO, and controller) to validate business rules, data flow, and transactional integrity.
 - Introduced immutable DTOs to clearly separate domain entities from external data contracts.
 - Developed REST controllers as a thin orchestration layer that maps HTTP requests to DTOs and delegates validated operations to the service layer.
 - Enforced separation of concerns to prevent controller bloat and ensure business logic remains independently testable.
-
+- Refactored service-layer error handling to return explicit, domain-specific outcomes for common data integrity issues (such as duplicate entities or missing dependencies).
+- Introduced enum-based domain result types to standardize error handling, simplify controller decision logic, and prepare the API for predictable UI-level feedback.
 
 ### Next Steps
 
-- Refactor service-layer error handling to return explicit, domain-specific outcomes for common data integrity issues (such as duplicate entities or missing dependencies).
-- Leverage enum-based result types to enable consistent logging, clearer diagnostics, and improved user feedback in future UI implementations.
+- Develop a React-based frontend to consume the REST API.
+- Implement client-side validation and structured error handling aligned with backend response contracts.
+- Provide interactive views for managing Pokémon, moves, and evolution chains.
